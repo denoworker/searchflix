@@ -1,22 +1,14 @@
 import { auth } from "@/lib/auth";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { getUserStats, getUserCredits } from "@/lib/database";
-import { isAdminEmail } from "@/lib/admin-config";
+import { getUserCredits } from "@/lib/database";
 import Link from "next/link";
 
 export const runtime = 'nodejs';
 import {
-  Users,
-  Activity,
   CreditCard,
   DollarSign,
-  TrendingUp,
-  Zap,
-  BarChart3,
   Settings,
-  UserPlus,
-  Calendar,
   MessageSquare,
   User
 } from "lucide-react";
@@ -24,9 +16,6 @@ import {
 export default async function DashboardPage() {
   const session = await auth();
   const user = session?.user;
-
-  // Check if user is admin
-  const isAdmin = isAdminEmail(user?.email);
 
   // Get user's credits
   let userCredits = 0;
@@ -36,52 +25,8 @@ export default async function DashboardPage() {
     console.error("Error fetching user credits:", error);
   }
 
-  // Get admin statistics only if user is admin
-  let userStats;
-  if (isAdmin) {
-    try {
-      userStats = await getUserStats();
-    } catch (error) {
-      console.error("Error fetching user stats:", error);
-      userStats = {
-        totalUsers: 0,
-        activeToday: 0,
-        newThisWeek: 0,
-        newThisMonth: 0
-      };
-    }
-  }
-
-  // Admin stats
-  const adminStats = userStats ? [
-    {
-      title: "Total Users",
-      value: userStats.totalUsers.toLocaleString(),
-      change: `+${userStats.newThisMonth} this month`,
-      icon: Users,
-    },
-    {
-      title: "Active Today",
-      value: userStats.activeToday.toLocaleString(),
-      change: "Users logged in today",
-      icon: Activity,
-    },
-    {
-      title: "New This Week",
-      value: userStats.newThisWeek.toLocaleString(),
-      change: "New registrations",
-      icon: UserPlus,
-    },
-    {
-      title: "New This Month",
-      value: userStats.newThisMonth.toLocaleString(),
-      change: "Monthly growth",
-      icon: Calendar,
-    },
-  ] : [];
-
-  // Regular user stats
-  const regularUserStats = [
+  // User stats
+  const userStats = [
     {
       title: "Your Credits",
       value: userCredits.toLocaleString(),
@@ -114,32 +59,31 @@ export default async function DashboardPage() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold tracking-tight">
-            {isAdmin ? "Admin Dashboard" : `Welcome back, ${user?.name?.split(' ')[0] || "User"}!`}
+            Welcome back, {user?.name?.split(' ')[0] || "User"}!
           </h1>
           <p className="text-muted-foreground">
-            {isAdmin
-              ? "Here's what's happening with your application."
-              : "Ready to start chatting with AI? Check your credits and explore the features below."
-            }
+            Ready to start chatting with AI? Check your credits and explore the features below.
           </p>
         </div>
-        {isAdmin && (
-          <div className="flex space-x-2">
-            <Button variant="outline">
-              <BarChart3 className="mr-2 h-4 w-4" />
-              Analytics
-            </Button>
-            <Button>
-              <Settings className="mr-2 h-4 w-4" />
-              Settings
-            </Button>
-          </div>
-        )}
+        <div className="flex space-x-2">
+          <Button asChild>
+            <Link href="/dashboard/chat">
+              <MessageSquare className="mr-2 h-4 w-4" />
+              Start Chat
+            </Link>
+          </Button>
+          <Button variant="outline" asChild>
+             <Link href="/dashboard/settings">
+               <Settings className="mr-2 h-4 w-4" />
+               Settings
+             </Link>
+           </Button>
+         </div>
       </div>
 
       {/* Stats Grid */}
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-        {(isAdmin ? adminStats : regularUserStats).map((stat) => (
+        {userStats.map((stat, index) => (
           <Card key={stat.title}>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">
@@ -161,40 +105,21 @@ export default async function DashboardPage() {
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
         <Card>
           <CardHeader>
-            <CardTitle>{isAdmin ? "Admin Actions" : "Quick Start"}</CardTitle>
+            <CardTitle>Quick Start</CardTitle>
             <CardDescription>
-              {isAdmin
-                ? "Manage your application and users"
-                : "Get started with AI chat and features"
-              }
+              Get started with AI chat and features
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-2">
-            {isAdmin ? (
-              <>
-                <Button className="w-full" variant="outline" asChild>
-                  <Link href="/admin">Admin Panel</Link>
-                </Button>
-                <Button className="w-full" variant="outline" asChild>
-                  <Link href="/admin/users">Manage Users</Link>
-                </Button>
-                <Button className="w-full" variant="outline" asChild>
-                  <Link href="/dashboard/analytics">View Analytics</Link>
-                </Button>
-              </>
-            ) : (
-              <>
-                <Button className="w-full" asChild>
-                  <Link href="/dashboard/chat">Start AI Chat</Link>
-                </Button>
-                <Button className="w-full" variant="outline" asChild>
-                  <Link href="/dashboard/billing">Billing & Plans</Link>
-                </Button>
-                <Button className="w-full" variant="outline" asChild>
-                  <Link href="/dashboard/profile">Edit Profile</Link>
-                </Button>
-              </>
-            )}
+            <Button className="w-full" asChild>
+              <Link href="/dashboard/chat">Start AI Chat</Link>
+            </Button>
+            <Button className="w-full" variant="outline" asChild>
+              <Link href="/dashboard/profile">Edit Profile</Link>
+            </Button>
+            <Button className="w-full" variant="outline" asChild>
+              <Link href="/dashboard/settings">Manage Settings</Link>
+            </Button>
           </CardContent>
         </Card>
 
@@ -202,42 +127,31 @@ export default async function DashboardPage() {
           <CardHeader>
             <CardTitle>Recent Activity</CardTitle>
             <CardDescription>
-              {isAdmin ? "System activity and updates" : "Your recent actions"}
+              Your recent actions and account updates
             </CardDescription>
           </CardHeader>
           <CardContent>
             <div className="space-y-3">
-              {isAdmin ? (
-                <>
-                  <div className="flex items-center space-x-2">
-                    <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-                    <span className="text-sm">New user registered</span>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
-                    <span className="text-sm">Credits updated</span>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <div className="w-2 h-2 bg-yellow-500 rounded-full"></div>
-                    <span className="text-sm">System maintenance</span>
-                  </div>
-                </>
-              ) : (
-                <>
-                  <div className="flex items-center space-x-2">
-                    <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-                    <span className="text-sm">Account created</span>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
-                    <span className="text-sm">Credits available: {userCredits}</span>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <div className="w-2 h-2 bg-purple-500 rounded-full"></div>
-                    <span className="text-sm">Ready to chat with AI</span>
-                  </div>
-                </>
-              )}
+              <div className="flex items-center space-x-2">
+                <MessageSquare className="h-4 w-4 text-blue-500" />
+                <span className="text-sm">Started AI chat session</span>
+                <span className="text-xs text-muted-foreground ml-auto">2 hours ago</span>
+              </div>
+              <div className="flex items-center space-x-2">
+                <User className="h-4 w-4 text-green-500" />
+                <span className="text-sm">Updated profile information</span>
+                <span className="text-xs text-muted-foreground ml-auto">1 day ago</span>
+              </div>
+              <div className="flex items-center space-x-2">
+                <Settings className="h-4 w-4 text-orange-500" />
+                <span className="text-sm">Changed account settings</span>
+                <span className="text-xs text-muted-foreground ml-auto">3 days ago</span>
+              </div>
+              <div className="flex items-center space-x-2">
+                <CreditCard className="h-4 w-4 text-purple-500" />
+                <span className="text-sm">Credits available: {userCredits}</span>
+                <span className="text-xs text-muted-foreground ml-auto">Current balance</span>
+              </div>
             </div>
           </CardContent>
         </Card>

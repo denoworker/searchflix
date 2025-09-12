@@ -8,19 +8,6 @@ A production-ready, feature-complete SAAS starter kit built with Next.js 15, des
 
 ---
 
-## 📺 **Follow The Creator**
-
-[![YouTube Channel](https://img.shields.io/badge/YouTube-The%20Metaverse%20Guy-red?style=for-the-badge&logo=youtube)](https://www.youtube.com/@TheMetaverseGuy)
-
-**🎥 Subscribe to [The Metaverse Guy](https://www.youtube.com/@TheMetaverseGuy)** for tutorials, updates, and insights about this SAAS kit and other cutting-edge development content!
-
----
-
-![Best SAAS Kit V2](https://img.shields.io/badge/Next.js-15.4.4-black?style=for-the-badge&logo=next.js)
-![TypeScript](https://img.shields.io/badge/TypeScript-5.0-blue?style=for-the-badge&logo=typescript)
-![Tailwind CSS](https://img.shields.io/badge/Tailwind-4.0-38B2AC?style=for-the-badge&logo=tailwind-css)
-![License](https://img.shields.io/badge/License-MIT-green?style=for-the-badge)
-
 ## ✨ Features
 
 ### 🔐 **Authentication & User Management**
@@ -78,137 +65,6 @@ Before you begin, ensure you have the following installed:
 - **Node.js** (version 18 or higher)
 - **npm** or **yarn** or **pnpm**
 - **Git**
-
-You'll also need accounts for:
-- [Google Cloud Console](https://console.cloud.google.com/) (for OAuth)
-- [Neon](https://neon.tech/) (for database)
-- [Stripe](https://stripe.com/) (for payments)
-- [OpenRouter](https://openrouter.ai/) (for AI features)
-
-## 🚀 Quick Start
-
-### 1. Clone the Repository
-
-```bash
-git clone https://github.com/your-username/best-saas-kit-v2.git
-cd best-saas-kit-v2
-```
-
-### 2. Install Dependencies
-
-```bash
-npm install
-# or
-yarn install
-# or
-pnpm install
-```
-
-### 3. Environment Setup
-
-Copy the example environment file:
-
-```bash
-cp .env.example .env.local
-```
-
-Fill in your environment variables in `.env.local` (see detailed setup below).
-
-### 4. Database Setup
-
-1. Create a Neon database (instructions below)
-2. Run the database initialization script:
-
-```bash
-npm run db:setup
-```
-
-### 5. Start Development Server
-
-```bash
-npm run dev
-```
-
-Open [http://localhost:3000](http://localhost:3000) to see your application.
-
-## 🔧 Detailed Setup Guide
-
-### 🗄️ Database Setup (Neon)
-
-1. **Create Neon Account**
-   - Go to [neon.tech](https://neon.tech/)
-   - Sign up for a free account
-   - Create a new project
-
-2. **Get Connection String**
-   - In your Neon dashboard, go to "Connection Details"
-   - Copy the connection string
-   - Add it to your `.env.local` as `DATABASE_URL`
-
-3. **Initialize Database**
-   ```bash
-   # The database tables will be created automatically when you first run the app
-   npm run dev
-   ```
-
-### 🔐 Google OAuth Setup
-
-1. **Google Cloud Console Setup**
-   - Go to [Google Cloud Console](https://console.cloud.google.com/)
-   - Create a new project or select existing one
-   - Enable the Google+ API
-
-2. **Create OAuth Credentials**
-   - Go to "Credentials" → "Create Credentials" → "OAuth 2.0 Client IDs"
-   - Choose "Web application"
-   - Add authorized redirect URIs:
-     - `http://localhost:3000/api/auth/callback/google` (development)
-     - `https://yourdomain.com/api/auth/callback/google` (production)
-
-3. **Add to Environment**
-   ```env
-   GOOGLE_CLIENT_ID=your-google-client-id
-   GOOGLE_CLIENT_SECRET=your-google-client-secret
-   ```
-
-### 💳 Stripe Setup
-
-1. **Create Stripe Account**
-   - Sign up at [stripe.com](https://stripe.com/)
-   - Complete account verification
-
-2. **Get API Keys**
-   - Go to Developers → API Keys
-   - Copy your publishable and secret keys
-   - Add to `.env.local`:
-   ```env
-   NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=pk_test_...
-   STRIPE_SECRET_KEY=sk_test_...
-   ```
-
-3. **Setup Webhooks**
-   - Go to Developers → Webhooks
-   - Add endpoint: `https://yourdomain.com/api/stripe/webhook`
-   - Select events: `checkout.session.completed`, `payment_intent.succeeded`
-   - Copy webhook secret to `.env.local`:
-   ```env
-   STRIPE_WEBHOOK_SECRET=whsec_...
-   ```
-
-### 🤖 OpenRouter Setup
-
-1. **Create OpenRouter Account**
-   - Sign up at [openrouter.ai](https://openrouter.ai/)
-   - Add credits to your account
-
-2. **Get API Key**
-   - Go to Keys section
-   - Create a new API key
-   - Add to `.env.local`:
-   ```env
-   OPENROUTER_API_KEY=sk-or-v1-...
-   OPENROUTER_MODEL=qwen/qwen3-235b-a22b-2507
-   ```
 
 ## 📁 Project Structure
 
@@ -329,15 +185,6 @@ npm run db:seed      # Seed database with sample data (if you add this script)
 
 3. **Deploy**
    - Vercel will automatically deploy your application
-   - Set up custom domain if needed
-
-### Other Platforms
-
-The application can be deployed to any platform that supports Next.js:
-- **Netlify**: Use `npm run build` and deploy the `.next` folder
-- **Railway**: Connect your GitHub repository
-- **DigitalOcean App Platform**: Use the Next.js template
-- **AWS Amplify**: Connect your repository and configure build settings
 
 ## 🔧 Environment Variables
 
@@ -390,23 +237,6 @@ OpenRouter API error
 - Verify you have credits in your OpenRouter account
 - Ensure `OPENROUTER_MODEL` is available
 
-### Getting Help
-
-- 📖 Check the [documentation](https://github.com/your-username/best-saas-kit-v2/wiki)
-- 🐛 Report bugs in [GitHub Issues](https://github.com/your-username/best-saas-kit-v2/issues)
-- 💬 Join our [Discord community](https://discord.gg/your-discord)
-- 📧 Email support: support@bestsaaskit.com
-
-## 🤝 Contributing
-
-We welcome contributions! Please see our [Contributing Guide](CONTRIBUTING.md) for details.
-
-1. Fork the repository
-2. Create your feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit your changes (`git commit -m 'Add some amazing feature'`)
-4. Push to the branch (`git push origin feature/amazing-feature`)
-5. Open a Pull Request
-
 ## 📄 License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
@@ -420,17 +250,3 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 - [Stripe](https://stripe.com/) - Payment processing
 - [Neon](https://neon.tech/) - Serverless PostgreSQL
 - [OpenRouter](https://openrouter.ai/) - AI model access
-
-## 📞 Support
-
-If you find this project helpful, please consider:
-- ⭐ Starring the repository
-- 🐛 Reporting bugs
-- 💡 Suggesting new features
-- 📢 Sharing with others
-
----
-
-**Built with ❤️ by the Best SAAS Kit team**
-
-[Website](https://bestsaaskit.com) • [Documentation](https://docs.bestsaaskit.com) • [YouTube](https://www.youtube.com/@TheMetaverseGuy) • [Discord](https://discord.gg/bestsaaskit) • [Twitter](https://twitter.com/bestsaaskit)

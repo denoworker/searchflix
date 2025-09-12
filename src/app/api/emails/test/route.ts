@@ -37,7 +37,7 @@ export async function GET() {
     message: 'Email test endpoint. Use POST to send a test email.',
     endpoints: {
       welcome: '/api/emails/welcome',
-      subscription: '/api/emails/subscription',
+  
       contact: '/api/emails/contact',
       test: '/api/emails/test'
     }

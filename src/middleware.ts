@@ -1,6 +1,6 @@
-import { auth } from "@/lib/auth"
+import { middlewareAuth } from "@/lib/auth-middleware"
 
-export default auth((req) => {
+export default middlewareAuth((req) => {
   // Define protected routes
   const protectedPaths = ['/dashboard', '/api/chat', '/api/usage', '/api/test-ai']
   const isProtectedPath = protectedPaths.some(path =>

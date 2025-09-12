@@ -9,49 +9,49 @@ const Testimonials = () => {
   const testimonials = [
     {
       name: "Sarah Chen",
-      role: "Founder, AI Startup",
-      company: "TechFlow",
-      content: "This kit saved me months of development time. I went from idea to MVP in just 2 weeks. The AI integrations are seamless and the code quality is exceptional.",
+      role: "Film Critic",
+      company: "MovieMag",
+      content: "SearchFlix has revolutionized how I discover films for reviews. The AI recommendations are spot-on, and I've found so many hidden gems I would have missed otherwise.",
       rating: 5,
       avatar: "/api/placeholder/40/40"
     },
     {
       name: "Marcus Rodriguez",
-      role: "Senior Developer",
-      company: "InnovateLabs",
-      content: "The best SAAS starter kit I've used. Clean architecture, modern stack, and excellent documentation. My team was productive from day one.",
+      role: "Movie Enthusiast",
+      company: "Cinephile",
+      content: "The best movie discovery platform I've ever used. The search is lightning-fast and the filtering options help me find exactly what I'm in the mood for.",
       rating: 5,
       avatar: "/api/placeholder/40/40"
     },
     {
       name: "Emily Watson",
-      role: "Product Manager",
-      company: "DataCorp",
-      content: "We launched our AI-powered analytics platform using this kit. The built-in authentication and payment processing saved us countless hours.",
+      role: "Film Student",
+      company: "NYU Film School",
+      content: "As a film student, this platform is invaluable for research. The detailed movie information and cast/crew data saves me hours of research time.",
       rating: 5,
       avatar: "/api/placeholder/40/40"
     },
     {
       name: "David Kim",
-      role: "Indie Hacker",
-      company: "Solo Founder",
-      content: "As a solo founder, this kit was a game-changer. I could focus on my unique features instead of rebuilding the same boilerplate code.",
+      role: "Home Theater Owner",
+      company: "Movie Night Host",
+      content: "Planning movie nights has never been easier. The watchlist feature and streaming availability info helps me organize perfect movie experiences for friends.",
       rating: 5,
       avatar: "/api/placeholder/40/40"
     },
     {
       name: "Lisa Thompson",
-      role: "CTO",
-      company: "StartupXYZ",
-      content: "The scalability and performance optimizations are impressive. We're handling thousands of users without any issues. Highly recommended!",
+      role: "Content Creator",
+      company: "FilmTok",
+      content: "The platform's recommendations have introduced me to incredible international films. My content has become more diverse and engaging thanks to SearchFlix.",
       rating: 5,
       avatar: "/api/placeholder/40/40"
     },
     {
       name: "Alex Johnson",
-      role: "Full Stack Developer",
-      company: "FreelanceForce",
-      content: "I've built multiple client projects with this kit. The TypeScript setup and component library make development a breeze. Worth every penny.",
+      role: "Movie Blogger",
+      company: "CinemaScope Blog",
+      content: "I've discovered more amazing films in the past month than I did all last year. The AI understands my taste perfectly and keeps surprising me with great suggestions.",
       rating: 5,
       avatar: "/api/placeholder/40/40"
     }
@@ -70,12 +70,12 @@ const Testimonials = () => {
           <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold tracking-tight mb-4">
             Loved by
             <span className="bg-gradient-to-r from-primary via-primary/80 to-primary/60 bg-clip-text text-transparent">
-              {" "}Developers
+              {" "}Movie Lovers
             </span>
           </h2>
           <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
-            Join thousands of developers who have successfully launched their AI SAAS applications 
-            using our comprehensive toolkit.
+            Join thousands of film enthusiasts who have discovered their next favorite movies 
+            using our AI-powered recommendation system.
           </p>
         </motion.div>
 

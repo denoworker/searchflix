@@ -22,9 +22,26 @@ export interface User {
   last_login: Date
   credits: number
   subscription_status: string
-  stripe_customer_id?: string
   subscription_id?: string
   subscription_end_date?: Date
+  role?: string
+}
+
+export interface Sitemap {
+  id: number
+  site_name: string
+  url: string
+  created_at: Date
+  updated_at: Date
+  created_by: number
+  status: string
+}
+
+export interface CreateSitemapData {
+  site_name: string
+  url: string
+  created_by: number
+  status?: string
 }
 
 export interface CreateUserData {
@@ -95,6 +112,23 @@ export async function getUserByEmail(email: string): Promise<User | null> {
     const result = await client.query(query, [email])
 
     return result.rows[0] as User || null
+  } finally {
+    client.release()
+  }
+}
+
+// Update user role
+export async function updateUserRole(userId: number, role: string): Promise<boolean> {
+  const client = await pool.connect()
+
+  try {
+    const query = `
+      UPDATE users 
+      SET role = $1, updated_at = CURRENT_TIMESTAMP 
+      WHERE id = $2
+    `
+    const result = await client.query(query, [role, userId])
+    return result.rowCount > 0
   } finally {
     client.release()
   }
@@ -415,7 +449,6 @@ export async function updateUserSubscription(
   userId: number,
   subscriptionData: {
     subscription_status: string
-    stripe_customer_id?: string
     subscription_id?: string
     subscription_end_date?: Date
   }
@@ -424,37 +457,22 @@ export async function updateUserSubscription(
 
   try {
     const query = `
-      UPDATE users
+      UPDATE users 
       SET subscription_status = $1,
-          stripe_customer_id = $2,
-          subscription_id = $3,
-          subscription_end_date = $4,
+          subscription_id = $2,
+          subscription_end_date = $3,
           updated_at = CURRENT_TIMESTAMP
-      WHERE id = $5
+      WHERE id = $4
     `
+    
     const result = await client.query(query, [
       subscriptionData.subscription_status,
-      subscriptionData.stripe_customer_id || null,
       subscriptionData.subscription_id || null,
       subscriptionData.subscription_end_date || null,
       userId
     ])
 
     return result.rowCount !== null && result.rowCount > 0
-  } finally {
-    client.release()
-  }
-}
-
-// Get user by Stripe customer ID
-export async function getUserByStripeCustomerId(stripeCustomerId: string): Promise<User | null> {
-  const client = await pool.connect()
-
-  try {
-    const query = 'SELECT * FROM users WHERE stripe_customer_id = $1'
-    const result = await client.query(query, [stripeCustomerId])
-
-    return result.rows[0] as User || null
   } finally {
     client.release()
   }
@@ -705,6 +723,133 @@ export async function getGrowthMetrics() {
 }
 
 // Close the pool (for cleanup)
+// Sitemap management functions
+export async function createSitemap(sitemapData: CreateSitemapData): Promise<Sitemap> {
+  const client = await pool.connect()
+  
+  try {
+    const query = `
+      INSERT INTO sitemaps (site_name, url, created_by, status)
+      VALUES ($1, $2, $3, $4)
+      RETURNING *
+    `
+    
+    const values = [
+      sitemapData.site_name,
+      sitemapData.url,
+      sitemapData.created_by,
+      sitemapData.status || 'active'
+    ]
+    
+    const result = await client.query(query, values)
+    return result.rows[0] as Sitemap
+  } finally {
+    client.release()
+  }
+}
+
+export async function getAllSitemaps(): Promise<Sitemap[]> {
+  const client = await pool.connect()
+  
+  try {
+    const query = `
+      SELECT s.*, u.name as creator_name, u.email as creator_email
+      FROM sitemaps s
+      LEFT JOIN users u ON s.created_by = u.id
+      ORDER BY s.created_at DESC
+    `
+    const result = await client.query(query)
+    return result.rows as Sitemap[]
+  } finally {
+    client.release()
+  }
+}
+
+export async function getSitemapById(id: number): Promise<Sitemap | null> {
+  const client = await pool.connect()
+  
+  try {
+    const query = 'SELECT * FROM sitemaps WHERE id = $1'
+    const result = await client.query(query, [id])
+    return result.rows[0] as Sitemap || null
+  } finally {
+    client.release()
+  }
+}
+
+export async function updateSitemap(id: number, updateData: Partial<CreateSitemapData>): Promise<boolean> {
+  const client = await pool.connect()
+  
+  try {
+    const fields = []
+    const values = []
+    let paramCount = 1
+    
+    if (updateData.site_name !== undefined) {
+      fields.push(`site_name = $${paramCount++}`)
+      values.push(updateData.site_name)
+    }
+    
+    if (updateData.url !== undefined) {
+      fields.push(`url = $${paramCount++}`)
+      values.push(updateData.url)
+    }
+    
+    if (updateData.status !== undefined) {
+      fields.push(`status = $${paramCount++}`)
+      values.push(updateData.status)
+    }
+    
+    if (fields.length === 0) return false
+    
+    fields.push(`updated_at = CURRENT_TIMESTAMP`)
+    values.push(id)
+    
+    const query = `
+      UPDATE sitemaps 
+      SET ${fields.join(', ')}
+      WHERE id = $${paramCount}
+    `
+    
+    const result = await client.query(query, values)
+    return result.rowCount > 0
+  } finally {
+    client.release()
+  }
+}
+
+export async function deleteSitemap(id: number): Promise<boolean> {
+  const client = await pool.connect()
+  
+  try {
+    const query = 'DELETE FROM sitemaps WHERE id = $1'
+    const result = await client.query(query, [id])
+    return result.rowCount > 0
+  } finally {
+    client.release()
+  }
+}
+
+export async function getSitemapStats() {
+  const client = await pool.connect()
+  
+  try {
+    const query = `
+      SELECT 
+        COUNT(*) as total_sitemaps,
+        COUNT(CASE WHEN status = 'active' THEN 1 END) as active_sitemaps,
+        COUNT(CASE WHEN status = 'inactive' THEN 1 END) as inactive_sitemaps,
+        COUNT(CASE WHEN status = 'pending' THEN 1 END) as pending_sitemaps,
+        COUNT(CASE WHEN DATE(created_at) = CURRENT_DATE THEN 1 END) as created_today
+      FROM sitemaps
+    `
+    const result = await client.query(query)
+    return result.rows[0]
+  } finally {
+    client.release()
+  }
+}
+
 export async function closePool(): Promise<void> {
   await pool.end()
 }

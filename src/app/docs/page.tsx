@@ -28,17 +28,17 @@ export default function DocsPage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <div className="text-center">
             <h1 className="text-4xl font-bold text-gray-900 dark:text-white mb-4">
-              Best SAAS Kit V2 Documentation
+              SearchFlix Documentation
             </h1>
             <p className="text-xl text-gray-600 dark:text-gray-300 max-w-3xl mx-auto">
-              Complete guide to building and deploying AI-powered SAAS applications with our comprehensive starter kit
+              Complete guide to using SearchFlix - the AI-powered movie discovery platform
             </p>
             <div className="flex justify-center gap-2 mt-6">
               <Badge variant="secondary">Next.js 15</Badge>
               <Badge variant="secondary">TypeScript</Badge>
               <Badge variant="secondary">Tailwind CSS</Badge>
               <Badge variant="secondary">PostgreSQL</Badge>
-              <Badge variant="secondary">Stripe</Badge>
+              <Badge variant="secondary">AI-Powered</Badge>
             </div>
           </div>
         </div>

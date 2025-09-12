@@ -14,7 +14,10 @@ import {
   Home,
   Menu,
   X,
-  ArrowLeft
+  ArrowLeft,
+  Globe,
+  MessageSquare,
+  LayoutDashboard
 } from "lucide-react"
 import { UserButtonClient } from "@/components/auth/user-button-client"
 
@@ -24,15 +27,24 @@ interface AdminClientProps {
 }
 
 const sidebarItems = [
-  { name: "Admin Dashboard", href: "/admin", icon: Shield },
-  { name: "User Management", href: "/admin/users", icon: Users },
-  { name: "Analytics", href: "/admin/analytics", icon: BarChart3 },
-  { name: "Settings", href: "/admin/settings", icon: Settings },
+  { name: "Overview", href: "/admin", icon: Shield, title: "Admin Overview" },
+  { name: "Dashboard", href: "/admin/dashboard", icon: LayoutDashboard, title: "Dashboard" },
+  { name: "Chat", href: "/admin/chat", icon: MessageSquare, title: "Chat" },
+  { name: "User Management", href: "/admin/users", icon: Users, title: "User Management" },
+  { name: "Analytics", href: "/admin/analytics", icon: BarChart3, title: "Analytics" },
+  { name: "Sitemap", href: "/admin/sitemap", icon: Globe, title: "Sitemap" },
+  { name: "Settings", href: "/admin/settings", icon: Settings, title: "Settings" },
 ]
 
 export function AdminClient({ children, adminUser }: AdminClientProps) {
   const [sidebarOpen, setSidebarOpen] = React.useState(false)
   const pathname = usePathname()
+  
+  // Get current page title based on pathname
+  const getCurrentPageTitle = () => {
+    const currentItem = sidebarItems.find(item => item.href === pathname)
+    return currentItem?.title || "Admin Dashboard"
+  }
 
   return (
     <div className="min-h-screen bg-background">
@@ -143,10 +155,7 @@ export function AdminClient({ children, adminUser }: AdminClientProps) {
                 <Menu className="h-4 w-4" />
               </Button>
               <div>
-                <h1 className="text-lg font-semibold">Admin Dashboard</h1>
-                <p className="text-sm text-muted-foreground">
-                  Logged in as: {adminUser.email}
-                </p>
+                <h1 className="text-lg font-semibold">{getCurrentPageTitle()}</h1>
               </div>
             </div>
             

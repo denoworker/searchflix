@@ -5,7 +5,7 @@ import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { ThemeToggle } from "@/components/ui/theme-toggle"
 import { cn } from "@/lib/utils"
-import { Menu, X, Zap } from "lucide-react"
+import { Menu, X, Film } from "lucide-react"
 import { SignInButton } from "@/components/auth/signin-button"
 import { UserButtonClient } from "@/components/auth/user-button-client"
 import { CreditsDisplay } from "@/components/credits/credits-display"
@@ -19,9 +19,9 @@ export function NavigationClient({ session }: NavigationClientProps) {
 
   const navItems = [
     { name: "Features", href: "#features" },
-    { name: "Pricing", href: "#pricing" },
-    { name: "Testimonials", href: "#testimonials" },
-    { name: "Documentation", href: "/docs" },
+
+    { name: "Reviews", href: "#testimonials" },
+    { name: "Browse Movies", href: "/dashboard" },
     { name: "Contact", href: "/contact" },
   ]
 
@@ -32,9 +32,9 @@ export function NavigationClient({ session }: NavigationClientProps) {
           {/* Logo */}
           <Link href="/" className="flex items-center space-x-2">
             <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary">
-              <Zap className="h-5 w-5 text-primary-foreground" />
+              <Film className="h-5 w-5 text-primary-foreground" />
             </div>
-            <span className="text-xl font-bold">Best SAAS Kit</span>
+            <span className="text-xl font-bold">SearchFlix</span>
           </Link>
 
           {/* Desktop Navigation */}
@@ -55,11 +55,11 @@ export function NavigationClient({ session }: NavigationClientProps) {
             <ThemeToggle />
             {!session ? (
               <>
-                <SignInButton>
-                  <Button variant="ghost">Sign In</Button>
+                <SignInButton variant="ghost">
+                  Sign In
                 </SignInButton>
                 <SignInButton>
-                  <Button>Get Started</Button>
+                  Get Started
                 </SignInButton>
               </>
             ) : (
@@ -107,11 +107,11 @@ export function NavigationClient({ session }: NavigationClientProps) {
               </div>
               {!session ? (
                 <>
-                  <SignInButton>
-                    <Button variant="ghost" className="w-full justify-start">Sign In</Button>
+                  <SignInButton variant="ghost" className="w-full justify-start">
+                    Sign In
                   </SignInButton>
-                  <SignInButton>
-                    <Button className="w-full">Get Started</Button>
+                  <SignInButton className="w-full">
+                    Get Started
                   </SignInButton>
                 </>
               ) : (

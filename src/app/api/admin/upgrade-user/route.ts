@@ -38,7 +38,6 @@ export async function POST(request: NextRequest) {
     // Update user to Pro subscription
     const updateResult = await updateUserSubscription(user.id, {
       subscription_status: 'pro',
-      stripe_customer_id: user.stripe_customer_id,
       subscription_id: `manual_upgrade_${Date.now()}`,
       // For manual upgrade, no end date (lifetime access)
     });

@@ -21,21 +21,10 @@ import {
   CreditCard
 } from "lucide-react"
 
-// Regular user navigation items
-const regularUserItems = [
+// User navigation items - purely user-focused
+const userNavigationItems = [
   { name: "Dashboard", href: "/dashboard", icon: Home },
   { name: "AI Chat", href: "/dashboard/chat", icon: MessageSquare },
-  { name: "Billing", href: "/dashboard/billing", icon: CreditCard },
-  { name: "Profile", href: "/dashboard/profile", icon: User },
-  { name: "Settings", href: "/dashboard/settings", icon: Settings },
-]
-
-// Admin user navigation items (includes everything)
-const adminUserItems = [
-  { name: "Dashboard", href: "/dashboard", icon: Home },
-  { name: "AI Chat", href: "/dashboard/chat", icon: MessageSquare },
-  { name: "Users", href: "/dashboard/users", icon: Users },
-  { name: "Analytics", href: "/dashboard/analytics", icon: BarChart3 },
   { name: "Profile", href: "/dashboard/profile", icon: User },
   { name: "Settings", href: "/dashboard/settings", icon: Settings },
 ]
@@ -48,9 +37,8 @@ interface DashboardClientProps {
 export function DashboardClient({ children, session }: DashboardClientProps) {
   const [sidebarOpen, setSidebarOpen] = useState(false)
 
-  // Determine if user is admin and get appropriate navigation items
-  const isAdmin = isAdminEmail(session.user.email)
-  const sidebarItems = isAdmin ? adminUserItems : regularUserItems
+  // All users get the same navigation items in the user dashboard
+  const sidebarItems = userNavigationItems
 
   return (
     <div className="min-h-screen bg-background">

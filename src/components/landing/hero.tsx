@@ -1,7 +1,7 @@
 "use client"
 
 import { Button } from "@/components/ui/button"
-import { ArrowRight, Sparkles, Zap, Code, Rocket, Github } from "lucide-react"
+import { ArrowRight, Sparkles, Film, Search, Star, Play } from "lucide-react"
 import Link from "next/link"
 import { motion } from "framer-motion"
 
@@ -29,8 +29,8 @@ const Hero = () => {
             transition={{ duration: 0.5, delay: 0.2 }}
             className="inline-flex items-center space-x-2 bg-muted/50 backdrop-blur-sm border border-border rounded-full px-3 py-1.5 sm:px-4 sm:py-2 text-xs sm:text-sm text-muted-foreground"
           >
-            <Sparkles className="w-3 h-3 sm:w-4 sm:h-4" />
-            <span className="whitespace-nowrap">Ultimate AI SAAS Kit - Launch in Minutes</span>
+            <Film className="w-3 h-3 sm:w-4 sm:h-4" />
+            <span className="whitespace-nowrap">AI-Powered Movie Discovery Platform</span>
           </motion.div>
 
           {/* Main Headline */}
@@ -40,13 +40,13 @@ const Hero = () => {
             transition={{ duration: 0.8, delay: 0.3 }}
             className="text-3xl sm:text-5xl lg:text-6xl xl:text-7xl font-bold tracking-tight leading-tight"
           >
-            Build AI-Powered
+Discover Your Next
             <br />
             <span className="bg-gradient-to-r from-primary via-primary/80 to-primary/60 bg-clip-text text-transparent">
-              SAAS Applications
+              Favorite Movie
             </span>
             <br />
-            in Minutes
+            with AI
           </motion.h1>
 
           {/* Subtitle */}
@@ -56,8 +56,8 @@ const Hero = () => {
             transition={{ duration: 0.8, delay: 0.4 }}
             className="text-base sm:text-lg lg:text-xl text-muted-foreground max-w-3xl mx-auto leading-relaxed px-4"
           >
-            The complete toolkit for developers to create, customize, and launch
-            AI-powered SAAS applications with authentication, payments, and modern UI components.
+Get personalized movie recommendations powered by AI. Search through millions of films,
+            discover hidden gems, and never run out of great movies to watch again.
           </motion.p>
 
           {/* Feature Pills */}
@@ -68,16 +68,16 @@ const Hero = () => {
             className="flex flex-wrap justify-center gap-4 text-sm"
           >
             <div className="flex items-center space-x-2 bg-muted/30 backdrop-blur-sm border border-border rounded-full px-4 py-2">
-              <Zap className="w-4 h-4 text-primary" />
-              <span>Next.js 15 + TypeScript</span>
+              <Search className="w-4 h-4 text-primary" />
+              <span>Smart Search</span>
             </div>
             <div className="flex items-center space-x-2 bg-muted/30 backdrop-blur-sm border border-border rounded-full px-4 py-2">
-              <Code className="w-4 h-4 text-primary" />
-              <span>ShadCN UI + Tailwind</span>
+              <Star className="w-4 h-4 text-primary" />
+              <span>AI Recommendations</span>
             </div>
             <div className="flex items-center space-x-2 bg-muted/30 backdrop-blur-sm border border-border rounded-full px-4 py-2">
-              <Rocket className="w-4 h-4 text-primary" />
-              <span>AI Integration Ready</span>
+              <Play className="w-4 h-4 text-primary" />
+              <span>Instant Discovery</span>
             </div>
           </motion.div>
 
@@ -93,8 +93,8 @@ const Hero = () => {
               className="text-base font-medium px-6 py-3 h-12 rounded-lg shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105"
               asChild
             >
-              <Link href="/get-started" className="flex items-center space-x-2">
-                <span>Get Started Free</span>
+              <Link href="/dashboard" className="flex items-center space-x-2">
+                <span>Start Discovering Movies</span>
                 <ArrowRight className="w-4 h-4" />
               </Link>
             </Button>
@@ -104,34 +104,11 @@ const Hero = () => {
               className="text-base font-medium px-6 py-3 h-12 rounded-lg border-2 hover:bg-muted/50 transition-all duration-300 hover:scale-105"
               asChild
             >
-              <Link href="/demo">View Live Demo</Link>
+              <Link href="/demo">Try Movie Search</Link>
             </Button>
           </motion.div>
 
-          {/* GitHub Button */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.7 }}
-            className="flex items-center justify-center pt-4"
-          >
-            <Button
-              size="lg"
-              variant="ghost"
-              className="text-base font-medium px-6 py-3 h-12 rounded-lg hover:bg-muted/30 transition-all duration-300 hover:scale-105 border border-border/50"
-              asChild
-            >
-              <Link
-                href="https://github.com/zainulabedeen123/Best-Saas-Kit--V2"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex items-center space-x-2"
-              >
-                <Github className="w-5 h-5" />
-                <span>View on GitHub</span>
-              </Link>
-            </Button>
-          </motion.div>
+
 
           {/* Social Proof */}
           <motion.div
@@ -140,13 +117,13 @@ const Hero = () => {
             transition={{ duration: 0.8, delay: 0.8 }}
             className="pt-8 text-sm text-muted-foreground"
           >
-            <p>Trusted by 1000+ developers worldwide</p>
+            <p>Loved by 10,000+ movie enthusiasts worldwide</p>
             <div className="flex justify-center items-center space-x-8 mt-4 opacity-60">
-              <div className="text-xs font-medium">⭐⭐⭐⭐⭐ 4.9/5</div>
+              <div className="text-xs font-medium">⭐⭐⭐⭐⭐ 4.8/5</div>
               <div className="text-xs">•</div>
-              <div className="text-xs font-medium">500+ GitHub Stars</div>
+              <div className="text-xs font-medium">1M+ Movies Searched</div>
               <div className="text-xs">•</div>
-              <div className="text-xs font-medium">Open Source</div>
+              <div className="text-xs font-medium">AI-Powered</div>
             </div>
           </motion.div>
         </motion.div>

@@ -3,6 +3,9 @@ export const ADMIN_EMAILS = [
   'zainulabedeen0002@gmail.com',
   'zain@bestsaaskit.com',
   '42023640+zainulabedeen123@users.noreply.github.com', // Your GitHub email
+  'admin@searchflix.com', // Default admin email
+  'bilal@searchflix.com', // Project owner
+  'filmipovdomains@gmail.com', // Current admin user
   // Add more admin emails as needed
 ] as const;
 

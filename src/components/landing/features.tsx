@@ -2,18 +2,18 @@
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import {
+  Search,
+  Sparkles,
+  Star,
+  Filter,
+  Heart,
   Zap,
-  Shield,
-  Database,
-  Palette,
-  Bot,
-  CreditCard,
-  Code,
-  Rocket,
+  Play,
+  Calendar,
   Users,
   BarChart3,
-  Lock,
-  Globe
+  Globe,
+  Bookmark
 } from "lucide-react"
 import { motion } from "framer-motion"
 import Image from "next/image"
@@ -21,76 +21,76 @@ import Image from "next/image"
 const Features = () => {
   const features = [
     {
-      icon: <Zap className="w-8 h-8" />,
-      title: "Lightning Fast Setup",
-      description: "Get your AI SAAS running in under 30 minutes with our pre-configured Next.js foundation.",
-      color: "text-yellow-500"
-    },
-    {
-      icon: <Shield className="w-8 h-8" />,
-      title: "Secure Authentication",
-      description: "Complete auth system with Clerk.com including social login, MFA, and user management.",
-      color: "text-green-500"
-    },
-    {
-      icon: <Database className="w-8 h-8" />,
-      title: "Scalable Database",
-      description: "PostgreSQL with Neon.tech and Prisma ORM for type-safe, scalable data operations.",
+      icon: <Search className="w-8 h-8" />,
+      title: "Smart Movie Search",
+      description: "Find any movie instantly with our intelligent search. Search by title, genre, actor, director, or even plot keywords.",
       color: "text-blue-500"
     },
     {
-      icon: <Bot className="w-8 h-8" />,
-      title: "AI Integration",
-      description: "OpenRouter integration with multiple AI models, usage tracking, and cost optimization.",
+      icon: <Sparkles className="w-8 h-8" />,
+      title: "AI-Powered Recommendations",
+      description: "Get personalized movie suggestions based on your preferences, viewing history, and mood using advanced AI algorithms.",
       color: "text-purple-500"
     },
     {
-      icon: <Palette className="w-8 h-8" />,
-      title: "Modern UI Components",
-      description: "Beautiful, accessible components with ShadCN UI and Tailwind CSS for rapid development.",
-      color: "text-pink-500"
+      icon: <Star className="w-8 h-8" />,
+      title: "Detailed Movie Info",
+      description: "Access comprehensive movie details including ratings, reviews, cast, crew, trailers, and streaming availability.",
+      color: "text-yellow-500"
     },
     {
-      icon: <CreditCard className="w-8 h-8" />,
-      title: "Payment Processing",
-      description: "Stripe integration with subscription management, usage-based billing, and webhooks.",
-      color: "text-emerald-500"
+      icon: <Filter className="w-8 h-8" />,
+      title: "Advanced Filtering",
+      description: "Filter movies by genre, year, rating, runtime, language, and more to find exactly what you're looking for.",
+      color: "text-green-500"
     },
     {
-      icon: <Code className="w-8 h-8" />,
-      title: "Developer Experience",
-      description: "TypeScript, ESLint, Prettier, and comprehensive documentation for smooth development.",
-      color: "text-orange-500"
-    },
-    {
-      icon: <BarChart3 className="w-8 h-8" />,
-      title: "Analytics & Monitoring",
-      description: "Built-in analytics, error tracking, and performance monitoring for production apps.",
-      color: "text-cyan-500"
-    },
-    {
-      icon: <Users className="w-8 h-8" />,
-      title: "Team Management",
-      description: "Multi-tenant architecture with role-based access control and team collaboration.",
-      color: "text-indigo-500"
-    },
-    {
-      icon: <Rocket className="w-8 h-8" />,
-      title: "Production Ready",
-      description: "Optimized for deployment with Vercel, including CI/CD pipelines and monitoring.",
+      icon: <Heart className="w-8 h-8" />,
+      title: "Personal Watchlist",
+      description: "Save movies to your personal watchlist, mark as watched, and rate your favorites to improve recommendations.",
       color: "text-red-500"
     },
     {
-      icon: <Lock className="w-8 h-8" />,
-      title: "Security First",
-      description: "OWASP compliance, data encryption, and security best practices built-in.",
-      color: "text-gray-500"
+      icon: <Zap className="w-8 h-8" />,
+      title: "Lightning Fast Results",
+      description: "Get instant search results and movie information with our optimized database and caching system.",
+      color: "text-orange-500"
+    },
+    {
+      icon: <Play className="w-8 h-8" />,
+      title: "Trailer Integration",
+      description: "Watch movie trailers directly in the app with seamless video playback and quality options.",
+      color: "text-cyan-500"
+    },
+    {
+      icon: <Calendar className="w-8 h-8" />,
+      title: "Release Calendar",
+      description: "Stay updated with upcoming movie releases and get notified about movies you're interested in.",
+      color: "text-indigo-500"
+    },
+    {
+      icon: <Users className="w-8 h-8" />,
+      title: "Social Features",
+      description: "Share your favorite movies with friends, see what others are watching, and discover new films together.",
+      color: "text-pink-500"
+    },
+    {
+      icon: <BarChart3 className="w-8 h-8" />,
+      title: "Viewing Statistics",
+      description: "Track your movie watching habits with detailed statistics and insights about your preferences.",
+      color: "text-emerald-500"
     },
     {
       icon: <Globe className="w-8 h-8" />,
-      title: "Global Scale",
-      description: "CDN integration, edge functions, and optimizations for worldwide performance.",
+      title: "Global Movie Database",
+      description: "Access movies from around the world with support for multiple languages and regional content.",
       color: "text-teal-500"
+    },
+    {
+      icon: <Bookmark className="w-8 h-8" />,
+      title: "Custom Collections",
+      description: "Create and organize custom movie collections based on themes, moods, or any criteria you choose.",
+      color: "text-gray-500"
     }
   ]
 
