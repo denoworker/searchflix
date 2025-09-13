@@ -44,6 +44,70 @@ export interface CreateSitemapData {
   status?: string
 }
 
+// SitemapMovie interfaces removed - using ExtractedMovie instead
+
+export interface RawMovie {
+  id: number
+  title: string
+  url: string
+  description?: string
+  image_url?: string
+  image_data?: string // Base64 encoded image
+  release_date?: string
+  genre?: string
+  rating?: string
+  duration?: string
+  director?: string
+  cast?: string
+  quality?: string // HD, 4K, etc.
+  size?: string // File size
+  language?: string // Hindi, English, etc.
+  scraped_from: number
+  scraped_at: Date
+  created_at: Date
+  updated_at: Date
+  status: string
+}
+
+export interface CreateRawMovieData {
+  title: string
+  url: string
+  description?: string
+  image_url?: string
+  image_data?: string
+  release_date?: string
+  genre?: string
+  rating?: string
+  duration?: string
+  director?: string
+  cast?: string
+  quality?: string
+  size?: string
+  language?: string
+  scraped_from: number
+  status?: string
+}
+
+export interface ExtractedMovie {
+  id: number
+  sitemap_id: number
+  title: string
+  url: string
+  site_name?: string
+  extracted_at: Date
+  created_at: Date
+  updated_at: Date
+  status: string
+}
+
+export interface CreateExtractedMovieData {
+  sitemap_id: number
+  title: string
+  url: string
+  site_name?: string
+  status?: string
+}
+
 export interface CreateUserData {
   google_id: string
   email: string
@@ -845,6 +909,514 @@ export async function getSitemapStats() {
     `
     const result = await client.query(query)
     return result.rows[0]
+  } finally {
+    client.release()
+  }
+}
+
+// Raw Movies management functions
+export async function createRawMoviesTable(): Promise<void> {
+  const client = await pool.connect()
+  
+  try {
+    const query = `
+      CREATE TABLE IF NOT EXISTS raw_movies (
+        id SERIAL PRIMARY KEY,
+        title VARCHAR(500) NOT NULL,
+        url TEXT NOT NULL,
+        description TEXT,
+        image_url TEXT,
+        image_data TEXT,
+        release_date VARCHAR(100),
+        genre VARCHAR(200),
+        rating VARCHAR(50),
+        duration VARCHAR(50),
+        director VARCHAR(200),
+        "cast" TEXT,
+        quality VARCHAR(50),
+        size VARCHAR(50),
+        language VARCHAR(100),
+        scraped_from INTEGER REFERENCES sitemaps(id),
+        scraped_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        status VARCHAR(50) DEFAULT 'active' CHECK (status IN ('active', 'inactive', 'processed'))
+      );
+      
+      CREATE INDEX IF NOT EXISTS idx_raw_movies_title ON raw_movies(title);
+      CREATE INDEX IF NOT EXISTS idx_raw_movies_scraped_from ON raw_movies(scraped_from);
+      CREATE INDEX IF NOT EXISTS idx_raw_movies_scraped_at ON raw_movies(scraped_at);
+      CREATE INDEX IF NOT EXISTS idx_raw_movies_status ON raw_movies(status);
+      CREATE INDEX IF NOT EXISTS idx_raw_movies_created_at ON raw_movies(created_at);
+    `
+    
+    await client.query(query)
+  } finally {
+    client.release()
+  }
+}
+
+export async function createRawMovie(movieData: CreateRawMovieData): Promise<RawMovie> {
+  const client = await pool.connect()
+  
+  try {
+    // Ensure table exists
+    await createRawMoviesTable()
+    
+    const query = `
+      INSERT INTO raw_movies (title, url, description, image_url, image_data, release_date, genre, rating, duration, director, "cast", quality, size, language, scraped_from, status)
+      VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16)
+      RETURNING *
+    `
+    
+    const values = [
+      movieData.title,
+      movieData.url,
+      movieData.description,
+      movieData.image_url,
+      movieData.image_data,
+      movieData.release_date,
+      movieData.genre,
+      movieData.rating,
+      movieData.duration,
+      movieData.director,
+      movieData.cast,
+      movieData.quality,
+      movieData.size,
+      movieData.language,
+      movieData.scraped_from,
+      movieData.status || 'active'
+    ]
+    
+    const result = await client.query(query, values)
+    // Force compilation refresh
+    return result.rows[0] as RawMovie
+  } finally {
+    client.release()
+  }
+}
+
+export async function getAllRawMovies(): Promise<RawMovie[]> {
+  const client = await pool.connect()
+  
+  try {
+    // Ensure table exists
+    await createRawMoviesTable()
+    
+    const query = `
+      SELECT rm.*, s.site_name as sitemap_name
+      FROM raw_movies rm
+      LEFT JOIN sitemaps s ON rm.scraped_from = s.id
+      ORDER BY rm.scraped_at DESC
+    `
+    
+    const result = await client.query(query)
+    return result.rows as RawMovie[]
+  } catch (error) {
+    console.error('Error fetching raw movies:', error)
+    return []
+  } finally {
+    client.release()
+  }
+}
+
+export async function getRawMoviesBySitemap(sitemapId: number): Promise<RawMovie[]> {
+  const client = await pool.connect()
+  
+  try {
+    // Ensure table exists
+    await createRawMoviesTable()
+    
+    const query = `
+      SELECT * FROM raw_movies
+      WHERE scraped_from = $1
+      ORDER BY scraped_at DESC
+    `
+    
+    const result = await client.query(query, [sitemapId])
+    return result.rows as RawMovie[]
+  } catch (error) {
+    console.error('Error fetching raw movies by sitemap:', error)
+    return []
+  } finally {
+    client.release()
+  }
+}
+
+export async function updateRawMovie(id: number, movieData: Partial<CreateRawMovieData>): Promise<RawMovie | null> {
+  const client = await pool.connect()
+  
+  try {
+    const fields = []
+    const values = []
+    let paramIndex = 1
+    
+    // Build dynamic query based on provided fields
+    if (movieData.title !== undefined) {
+      fields.push(`title = $${paramIndex++}`)
+      values.push(movieData.title)
+    }
+    if (movieData.url !== undefined) {
+      fields.push(`url = $${paramIndex++}`)
+      values.push(movieData.url)
+    }
+    if (movieData.description !== undefined) {
+      fields.push(`description = $${paramIndex++}`)
+      values.push(movieData.description)
+    }
+    if (movieData.image_url !== undefined) {
+      fields.push(`image_url = $${paramIndex++}`)
+      values.push(movieData.image_url)
+    }
+    if (movieData.image_data !== undefined) {
+      fields.push(`image_data = $${paramIndex++}`)
+      values.push(movieData.image_data)
+    }
+    if (movieData.release_date !== undefined) {
+      fields.push(`release_date = $${paramIndex++}`)
+      values.push(movieData.release_date)
+    }
+    if (movieData.genre !== undefined) {
+      fields.push(`genre = $${paramIndex++}`)
+      values.push(movieData.genre)
+    }
+    if (movieData.rating !== undefined) {
+      fields.push(`rating = $${paramIndex++}`)
+      values.push(movieData.rating)
+    }
+    if (movieData.duration !== undefined) {
+      fields.push(`duration = $${paramIndex++}`)
+      values.push(movieData.duration)
+    }
+    if (movieData.director !== undefined) {
+      fields.push(`director = $${paramIndex++}`)
+      values.push(movieData.director)
+    }
+    if (movieData.cast !== undefined) {
+      fields.push(`"cast" = $${paramIndex++}`)
+      values.push(movieData.cast)
+    }
+    if (movieData.quality !== undefined) {
+      fields.push(`quality = $${paramIndex++}`)
+      values.push(movieData.quality)
+    }
+    if (movieData.size !== undefined) {
+      fields.push(`size = $${paramIndex++}`)
+      values.push(movieData.size)
+    }
+    if (movieData.language !== undefined) {
+      fields.push(`language = $${paramIndex++}`)
+      values.push(movieData.language)
+    }
+    if (movieData.status !== undefined) {
+      fields.push(`status = $${paramIndex++}`)
+      values.push(movieData.status)
+    }
+    
+    if (fields.length === 0) {
+      return null // No fields to update
+    }
+    
+    // Add updated_at timestamp
+    fields.push(`updated_at = CURRENT_TIMESTAMP`)
+    values.push(id)
+    
+    const query = `
+      UPDATE raw_movies 
+      SET ${fields.join(', ')}
+      WHERE id = $${paramIndex}
+      RETURNING *
+    `
+    
+    const result = await client.query(query, values)
+    return result.rows[0] as RawMovie || null
+  } catch (error) {
+    console.error('Error updating raw movie:', error)
+    return null
+  } finally {
+    client.release()
+  }
+}
+
+export async function getRawMovieById(id: number): Promise<RawMovie | null> {
+  const client = await pool.connect()
+  
+  try {
+    const query = `
+      SELECT rm.*, s.site_name as sitemap_name
+      FROM raw_movies rm
+      LEFT JOIN sitemaps s ON rm.scraped_from = s.id
+      WHERE rm.id = $1
+    `
+    
+    const result = await client.query(query, [id])
+    return result.rows[0] as RawMovie || null
+  } catch (error) {
+    console.error('Error fetching raw movie by id:', error)
+    return null
+  } finally {
+    client.release()
+  }
+}
+
+export async function deleteRawMovie(id: number): Promise<boolean> {
+  const client = await pool.connect()
+  
+  try {
+    const query = 'DELETE FROM raw_movies WHERE id = $1'
+    const result = await client.query(query, [id])
+    return result.rowCount > 0
+  } catch (error) {
+    console.error('Error deleting raw movie:', error)
+    return false
+  } finally {
+    client.release()
+  }
+}
+
+export async function deleteRawMoviesBySitemapId(sitemapId: number): Promise<boolean> {
+  const client = await pool.connect()
+  
+  try {
+    const query = 'DELETE FROM raw_movies WHERE scraped_from = $1'
+    const result = await client.query(query, [sitemapId])
+    return result.rowCount !== null && result.rowCount >= 0
+  } catch (error) {
+    console.error('Error deleting raw movies by sitemap:', error)
+    return false
+  } finally {
+    client.release()
+  }
+}
+
+export async function getRawMovieStats() {
+  const client = await pool.connect()
+  
+  try {
+    // Ensure table exists
+    await createRawMoviesTable()
+    
+    const query = `
+      SELECT 
+        COUNT(*) as total_movies,
+        COUNT(CASE WHEN status = 'active' THEN 1 END) as active_movies,
+        COUNT(CASE WHEN status = 'inactive' THEN 1 END) as inactive_movies,
+        COUNT(CASE WHEN status = 'processed' THEN 1 END) as processed_movies,
+        COUNT(CASE WHEN scraped_at >= CURRENT_DATE THEN 1 END) as scraped_today
+      FROM raw_movies
+    `
+    
+    const result = await client.query(query)
+    return result.rows[0]
+  } catch (error) {
+    console.error('Error getting raw movie stats:', error)
+    return {
+      total_movies: 0,
+      active_movies: 0,
+      inactive_movies: 0,
+      processed_movies: 0,
+      scraped_today: 0
+    }
+  } finally {
+    client.release()
+  }
+}
+
+// Sitemap Movies functions removed - using ExtractedMovie functions instead
+
+// Extracted Movies functions
+export async function createExtractedMoviesTable(): Promise<void> {
+  const client = await pool.connect()
+  
+  try {
+    const query = `
+      CREATE TABLE IF NOT EXISTS extracted_movies (
+        id SERIAL PRIMARY KEY,
+        sitemap_id INTEGER REFERENCES sitemaps(id) ON DELETE CASCADE,
+        title VARCHAR(500) NOT NULL,
+        url TEXT NOT NULL,
+        site_name VARCHAR(255),
+        extracted_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        status VARCHAR(50) DEFAULT 'active' CHECK (status IN ('active', 'inactive', 'processed'))
+      );
+      
+      CREATE INDEX IF NOT EXISTS idx_extracted_movies_sitemap_id ON extracted_movies(sitemap_id);
+      CREATE INDEX IF NOT EXISTS idx_extracted_movies_title ON extracted_movies(title);
+      CREATE INDEX IF NOT EXISTS idx_extracted_movies_url ON extracted_movies(url);
+      CREATE INDEX IF NOT EXISTS idx_extracted_movies_status ON extracted_movies(status);
+      CREATE INDEX IF NOT EXISTS idx_extracted_movies_extracted_at ON extracted_movies(extracted_at);
+      
+      DO $$ 
+      BEGIN
+        IF NOT EXISTS (
+          SELECT 1 FROM information_schema.table_constraints 
+          WHERE constraint_name = 'unique_extracted_movie_url_sitemap' 
+          AND table_name = 'extracted_movies'
+        ) THEN
+          ALTER TABLE extracted_movies ADD CONSTRAINT unique_extracted_movie_url_sitemap UNIQUE (url, sitemap_id);
+        END IF;
+      END $$;
+    `
+    
+    await client.query(query)
+  } finally {
+    client.release()
+  }
+}
+
+export async function createExtractedMovie(movieData: CreateExtractedMovieData): Promise<ExtractedMovie> {
+  const client = await pool.connect()
+  try {
+    // Ensure table exists
+    await createExtractedMoviesTable()
+    
+    const query = `
+      INSERT INTO extracted_movies (sitemap_id, title, url, site_name, status)
+      VALUES ($1, $2, $3, $4, $5)
+      RETURNING *
+    `
+    const values = [
+      movieData.sitemap_id,
+      movieData.title,
+      movieData.url,
+      movieData.site_name,
+      movieData.status || 'active'
+    ]
+    
+    const result = await client.query(query, values)
+    return result.rows[0]
+  } finally {
+    client.release()
+  }
+}
+
+export async function createExtractedMoviesBatch(moviesData: CreateExtractedMovieData[]): Promise<ExtractedMovie[]> {
+  if (moviesData.length === 0) return []
+  
+  const client = await pool.connect()
+  try {
+    // Ensure table exists
+    await createExtractedMoviesTable()
+    
+    const values: any[] = []
+    const placeholders: string[] = []
+    
+    moviesData.forEach((movie, index) => {
+      const baseIndex = index * 5
+      placeholders.push(`($${baseIndex + 1}, $${baseIndex + 2}, $${baseIndex + 3}, $${baseIndex + 4}, $${baseIndex + 5})`)
+      values.push(
+        movie.sitemap_id,
+        movie.title,
+        movie.url,
+        movie.site_name,
+        movie.status || 'active'
+      )
+    })
+    
+    const query = `
+      INSERT INTO extracted_movies (sitemap_id, title, url, site_name, status)
+      VALUES ${placeholders.join(', ')}
+      ON CONFLICT (url, sitemap_id) DO NOTHING
+      RETURNING *
+    `
+    
+    const result = await client.query(query, values)
+    return result.rows
+  } finally {
+    client.release()
+  }
+}
+
+export async function getAllExtractedMovies(): Promise<ExtractedMovie[]> {
+  const client = await pool.connect()
+  try {
+    // Ensure table exists
+    await createExtractedMoviesTable()
+    
+    const query = `
+      SELECT em.*, s.site_name as sitemap_site_name 
+      FROM extracted_movies em
+      JOIN sitemaps s ON em.sitemap_id = s.id
+      ORDER BY em.created_at DESC
+    `
+    const result = await client.query(query)
+    return result.rows
+  } finally {
+    client.release()
+  }
+}
+
+export async function getExtractedMovieStats() {
+  const client = await pool.connect()
+  try {
+    // Ensure table exists
+    await createExtractedMoviesTable()
+    
+    const query = `
+      SELECT 
+        COUNT(*) as total_movies,
+        COUNT(CASE WHEN status = 'active' THEN 1 END) as active_movies,
+        COUNT(CASE WHEN status = 'processed' THEN 1 END) as processed_movies,
+        COUNT(DISTINCT sitemap_id) as total_sitemaps_with_movies,
+        DATE_TRUNC('day', MIN(created_at)) as first_movie_date,
+        DATE_TRUNC('day', MAX(created_at)) as last_movie_date
+      FROM extracted_movies
+    `
+    const result = await client.query(query)
+    return result.rows[0]
+  } finally {
+    client.release()
+  }
+}
+
+export async function deleteExtractedMovie(id: number): Promise<boolean> {
+  const client = await pool.connect()
+  try {
+    const query = 'DELETE FROM extracted_movies WHERE id = $1'
+    const result = await client.query(query, [id])
+    return result.rowCount !== null && result.rowCount > 0
+  } finally {
+    client.release()
+  }
+}
+
+export async function deleteExtractedMoviesBySitemapId(sitemapId: number): Promise<boolean> {
+  const client = await pool.connect()
+  try {
+    const query = 'DELETE FROM extracted_movies WHERE sitemap_id = $1'
+    const result = await client.query(query, [sitemapId])
+    return result.rowCount !== null && result.rowCount >= 0
+  } finally {
+    client.release()
+  }
+}
+
+export async function getExtractedMovie(id: number): Promise<ExtractedMovie | null> {
+  const client = await pool.connect()
+  try {
+    // Ensure table exists
+    await createExtractedMoviesTable()
+    
+    const query = 'SELECT * FROM extracted_movies WHERE id = $1'
+    const result = await client.query(query, [id])
+    return result.rows[0] || null
+  } finally {
+    client.release()
+  }
+}
+
+export async function updateExtractedMovieStatus(id: number, status: string): Promise<boolean> {
+  const client = await pool.connect()
+  try {
+    const query = `
+      UPDATE extracted_movies 
+      SET status = $1, updated_at = CURRENT_TIMESTAMP 
+      WHERE id = $2
+    `
+    const result = await client.query(query, [status, id])
+    return result.rowCount !== null && result.rowCount > 0
   } finally {
     client.release()
   }

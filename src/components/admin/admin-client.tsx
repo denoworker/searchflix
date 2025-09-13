@@ -17,7 +17,9 @@ import {
   ArrowLeft,
   Globe,
   MessageSquare,
-  LayoutDashboard
+  LayoutDashboard,
+  Download,
+  Link2
 } from "lucide-react"
 import { UserButtonClient } from "@/components/auth/user-button-client"
 
@@ -33,6 +35,8 @@ const sidebarItems = [
   { name: "User Management", href: "/admin/users", icon: Users, title: "User Management" },
   { name: "Analytics", href: "/admin/analytics", icon: BarChart3, title: "Analytics" },
   { name: "Sitemap", href: "/admin/sitemap", icon: Globe, title: "Sitemap" },
+  { name: "Scraper", href: "/admin/scraper", icon: Download, title: "Movie Scraper" },
+  { name: "URLs", href: "/admin/urls", icon: Link2, title: "Movie URLs" },
   { name: "Settings", href: "/admin/settings", icon: Settings, title: "Settings" },
 ]
 

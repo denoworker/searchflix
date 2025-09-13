@@ -65,15 +65,33 @@ export async function getCurrentAdminUser() {
 export async function requireAdminAccess() {
   const session = await auth();
   
-  if (!session?.user) {
-    redirect("/auth/signin?callbackUrl=/admin");
+  if (!session?.user?.email) {
+    throw new Error('Unauthorized - Please sign in');
   }
   
-  if (!isAdminEmail(session.user.email)) {
-    redirect("/dashboard?error=unauthorized");
-  }
+  // Check both email-based admin config and database role
+  const isEmailAdmin = isAdminEmail(session.user.email);
   
-  return session.user;
+  try {
+    const user = await getUserByEmail(session.user.email);
+    const isDatabaseAdmin = user?.role === 'admin';
+    
+    if (!isEmailAdmin && !isDatabaseAdmin) {
+      throw new Error('Forbidden - Admin access required');
+    }
+    
+    return session.user;
+  } catch (error) {
+    if (error.message.includes('Forbidden') || error.message.includes('Unauthorized')) {
+      throw error;
+    }
+    console.error('Error checking admin access:', error);
+    // Fallback to email-based check if database fails
+    if (!isEmailAdmin) {
+      throw new Error('Forbidden - Admin access required');
+    }
+    return session.user;
+  }
 }
 
 // Require specific admin permission

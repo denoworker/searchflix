@@ -1,8 +1,7 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { auth } from '@/lib/auth';
-import { getSitemapById, updateSitemap, deleteSitemap } from '@/lib/database';
+import { NextRequest, NextResponse } from 'next/server'
+import { auth } from '@/lib/auth'
+import { getUserByEmail, getSitemapById, updateSitemap, deleteSitemap, deleteExtractedMoviesBySitemapId, deleteRawMoviesBySitemapId } from '@/lib/database'
 import { isAdminEmail } from '@/lib/admin-config';
-import { getUserByEmail } from '@/lib/database';
 
 export const runtime = 'nodejs';
 
@@ -122,6 +121,9 @@ export async function PUT(
       }
     }
 
+    // Check if URL is being changed
+    const urlChanged = url && url !== existingSitemap.url;
+
     // Update sitemap
     const updated = await updateSitemap(sitemapId, {
       site_name,
@@ -134,6 +136,22 @@ export async function PUT(
         { error: 'Failed to update sitemap' },
         { status: 500 }
       );
+    }
+
+    // If URL changed, delete old extracted URLs and raw movies to trigger re-extraction
+    if (urlChanged) {
+      try {
+        // Delete old extracted URLs for this sitemap
+        await deleteExtractedMoviesBySitemapId(sitemapId);
+        console.log(`Deleted old extracted URLs for sitemap ${sitemapId} due to URL change`);
+        
+        // Delete old raw movies for this sitemap
+        await deleteRawMoviesBySitemapId(sitemapId);
+        console.log(`Deleted old raw movies for sitemap ${sitemapId} due to URL change`);
+      } catch (error) {
+        console.error('Error deleting old data for sitemap:', error);
+        // Continue with the update even if deletion fails
+      }
     }
 
     // Fetch updated sitemap

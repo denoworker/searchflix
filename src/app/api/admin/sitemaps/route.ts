@@ -1,8 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { auth } from '@/lib/auth';
-import { createSitemap, getAllSitemaps, getSitemapStats } from '@/lib/database';
+import { createSitemap, getAllSitemaps, getSitemapStats, createExtractedMoviesBatch } from '@/lib/database';
 import { isAdminEmail } from '@/lib/admin-config';
 import { getUserByEmail } from '@/lib/database';
+import { parseSitemapForMovies } from '@/lib/sitemap-parser';
 
 export const runtime = 'nodejs';
 
@@ -103,7 +104,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Create sitemap
+    // Create sitemap first
     const sitemap = await createSitemap({
       site_name,
       url,
@@ -111,10 +112,39 @@ export async function POST(request: NextRequest) {
       status
     });
 
+    // Parse sitemap and extract movie URLs
+    let movieCount = 0;
+    let parseError = null;
+    
+    try {
+      console.log(`Parsing sitemap for movies: ${url}`);
+      const parsedMovies = await parseSitemapForMovies(url);
+      
+      if (parsedMovies.length > 0) {
+        const extractedMovies = parsedMovies.map(movie => ({
+          sitemap_id: sitemap.id,
+          title: movie.title,
+          url: movie.url,
+          site_name: site_name,
+          status: 'active'
+        }));
+        const createdMovies = await createExtractedMoviesBatch(extractedMovies);
+        movieCount = createdMovies.length;
+        console.log(`Successfully stored ${movieCount} movies from sitemap`);
+      } else {
+        console.log('No movies found in sitemap');
+      }
+    } catch (error) {
+      console.error('Error parsing sitemap for movies:', error);
+      parseError = error instanceof Error ? error.message : 'Unknown parsing error';
+    }
+
     return NextResponse.json({
       success: true,
-      message: 'Sitemap created successfully',
-      sitemap
+      message: `Sitemap created successfully${movieCount > 0 ? ` with ${movieCount} movies extracted` : ''}`,
+      sitemap,
+      movieCount,
+      parseError
     });
 
   } catch (error) {

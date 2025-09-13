@@ -140,9 +140,24 @@ export function SitemapManagementClient({
       // Refresh sitemaps list
       await refreshSitemaps()
       
+      // Show success message with movie extraction info
+      let description = data.message || `Sitemap ${editingSitemap ? 'updated' : 'created'} successfully`
+      
+      if (!editingSitemap && data.movieCount !== undefined) {
+        if (data.movieCount > 0) {
+          description += `. Found and stored ${data.movieCount} movie URLs.`
+        } else {
+          description += `. No movie URLs were found in the sitemap.`
+        }
+        
+        if (data.parseError) {
+          description += ` Warning: ${data.parseError}`
+        }
+      }
+      
       toast({
         title: "Success",
-        description: data.message || `Sitemap ${editingSitemap ? 'updated' : 'created'} successfully`,
+        description,
       })
 
       // Close dialog and reset form

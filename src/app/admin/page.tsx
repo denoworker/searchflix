@@ -6,18 +6,21 @@ import {
   Activity, 
   Calendar,
   TrendingUp,
-  Clock
+  Clock,
+  ArrowRight
 } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import Link from "next/link";
 
 export const runtime = 'nodejs';
 
-export default async function AdminDashboard() {
+export default async function AdminOverview() {
   // Get detailed statistics
   let stats;
   try {
-    console.log("Fetching admin dashboard stats...");
+    console.log("Fetching admin overview stats...");
     stats = await getDetailedUserStats();
     console.log("Admin stats fetched:", stats);
   } catch (error) {
@@ -37,7 +40,7 @@ export default async function AdminDashboard() {
   // Get recent user activity
   let recentUsers: User[];
   try {
-    recentUsers = await getRecentUserActivity(10);
+    recentUsers = await getRecentUserActivity(5);
   } catch (error) {
     console.error("Error fetching recent users:", error);
     recentUsers = [];
@@ -93,13 +96,12 @@ export default async function AdminDashboard() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-3xl font-bold tracking-tight">Admin Dashboard</h1>
+        <h1 className="text-3xl font-bold tracking-tight">Admin Overview</h1>
         <p className="text-muted-foreground">
-          Overview of user activity and system statistics (Real-time data from database).
+          Quick overview of system status and key metrics.
         </p>
-        {/* Debug info to verify real data */}
         <div className="text-xs text-muted-foreground mt-2">
-          Last updated: {new Date().toLocaleString()} | Total Users: {stats.totalUsers} | Data Source: PostgreSQL Database
+          Last updated: {new Date().toLocaleString()} | Total Users: {stats.totalUsers}
         </div>
       </div>
 
@@ -124,16 +126,53 @@ export default async function AdminDashboard() {
         })}
       </div>
 
-      {/* Recent User Activity */}
+      {/* Quick Access and Recent Activity */}
       <div className="grid gap-6 md:grid-cols-2">
+        {/* Quick Access */}
+        <Card>
+          <CardHeader>
+            <CardTitle>Quick Access</CardTitle>
+            <CardDescription>
+              Jump to key admin functions
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-3">
+            <Link href="/admin/dashboard">
+              <Button variant="outline" className="w-full justify-between">
+                <span>Full Dashboard</span>
+                <ArrowRight className="h-4 w-4" />
+              </Button>
+            </Link>
+            <Link href="/admin/users">
+              <Button variant="outline" className="w-full justify-between">
+                <span>User Management</span>
+                <ArrowRight className="h-4 w-4" />
+              </Button>
+            </Link>
+            <Link href="/admin/analytics">
+              <Button variant="outline" className="w-full justify-between">
+                <span>Analytics</span>
+                <ArrowRight className="h-4 w-4" />
+              </Button>
+            </Link>
+            <Link href="/admin/sitemap">
+              <Button variant="outline" className="w-full justify-between">
+                <span>Sitemap Management</span>
+                <ArrowRight className="h-4 w-4" />
+              </Button>
+            </Link>
+          </CardContent>
+        </Card>
+
+        {/* Recent Activity Summary */}
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center space-x-2">
               <Clock className="h-5 w-5" />
-              <span>Recent User Activity</span>
+              <span>Recent Activity</span>
             </CardTitle>
             <CardDescription>
-              Latest user logins and registrations
+              Latest user activity summary
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -142,14 +181,14 @@ export default async function AdminDashboard() {
                 <p className="text-muted-foreground">No recent activity</p>
               </div>
             ) : (
-              <div className="space-y-4">
+              <div className="space-y-3">
                 {recentUsers.map((user) => (
                   <div
                     key={user.id}
-                    className="flex items-center justify-between p-3 border rounded-lg"
+                    className="flex items-center justify-between p-2 border rounded-lg"
                   >
                     <div className="flex items-center space-x-3">
-                      <Avatar className="h-8 w-8">
+                      <Avatar className="h-6 w-6">
                         <AvatarImage src={user.image_url || ""} alt={user.name || ""} />
                         <AvatarFallback className="text-xs">
                           {user.name?.charAt(0)?.toUpperCase() || user.email.charAt(0).toUpperCase()}
@@ -164,7 +203,6 @@ export default async function AdminDashboard() {
                             </Badge>
                           )}
                         </div>
-                        <p className="text-xs text-muted-foreground">{user.email}</p>
                       </div>
                     </div>
                     <div className="text-right">
@@ -174,46 +212,53 @@ export default async function AdminDashboard() {
                     </div>
                   </div>
                 ))}
+                <div className="text-center pt-2">
+                  <Link href="/admin/dashboard">
+                    <Button variant="outline" size="sm">
+                      View Full Dashboard
+                    </Button>
+                  </Link>
+                </div>
               </div>
             )}
           </CardContent>
         </Card>
-
-        {/* Quick Actions */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center space-x-2">
-              <TrendingUp className="h-5 w-5" />
-              <span>Quick Stats</span>
-            </CardTitle>
-            <CardDescription>
-              Key metrics at a glance
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-4">
-              <div className="flex justify-between items-center p-3 bg-muted rounded-lg">
-                <span className="text-sm font-medium">Users Today</span>
-                <span className="text-lg font-bold text-green-600">+{stats.newToday}</span>
-              </div>
-              <div className="flex justify-between items-center p-3 bg-muted rounded-lg">
-                <span className="text-sm font-medium">Users This Week</span>
-                <span className="text-lg font-bold text-blue-600">+{stats.newThisWeek}</span>
-              </div>
-              <div className="flex justify-between items-center p-3 bg-muted rounded-lg">
-                <span className="text-sm font-medium">Users This Month</span>
-                <span className="text-lg font-bold text-purple-600">+{stats.newThisMonth}</span>
-              </div>
-              <div className="flex justify-between items-center p-3 bg-muted rounded-lg">
-                <span className="text-sm font-medium">Active Rate</span>
-                <span className="text-lg font-bold text-orange-600">
-                  {stats.totalUsers > 0 ? Math.round((stats.activeThisMonth / stats.totalUsers) * 100) : 0}%
-                </span>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
       </div>
+
+      {/* System Status */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center space-x-2">
+            <TrendingUp className="h-5 w-5" />
+            <span>System Status</span>
+          </CardTitle>
+          <CardDescription>
+            Current system performance metrics
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="grid gap-4 md:grid-cols-4">
+            <div className="text-center p-3 bg-green-50 dark:bg-green-950 rounded-lg">
+              <div className="text-lg font-bold text-green-600">Online</div>
+              <div className="text-xs text-muted-foreground">System Status</div>
+            </div>
+            <div className="text-center p-3 bg-blue-50 dark:bg-blue-950 rounded-lg">
+              <div className="text-lg font-bold text-blue-600">{stats.totalUsers}</div>
+              <div className="text-xs text-muted-foreground">Total Users</div>
+            </div>
+            <div className="text-center p-3 bg-purple-50 dark:bg-purple-950 rounded-lg">
+              <div className="text-lg font-bold text-purple-600">{stats.activeToday}</div>
+              <div className="text-xs text-muted-foreground">Active Today</div>
+            </div>
+            <div className="text-center p-3 bg-orange-50 dark:bg-orange-950 rounded-lg">
+              <div className="text-lg font-bold text-orange-600">
+                {stats.totalUsers > 0 ? Math.round((stats.activeThisMonth / stats.totalUsers) * 100) : 0}%
+              </div>
+              <div className="text-xs text-muted-foreground">Engagement Rate</div>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
     </div>
   );
 }
